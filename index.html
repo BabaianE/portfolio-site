@@ -1,36 +1,899 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emanuel - Cloud Engineer</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CloudAxis — Azure & FinOps for Insurance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:      #060d1a;
+    --navy-mid:  #0b1628;
+    --navy-card: #0f1e35;
+    --azure:     #0078d4;
+    --azure-lt:  #2ea8ff;
+    --azure-glow:#0078d440;
+    --gold:      #c9a84c;
+    --gold-lt:   #e8cc88;
+    --white:     #f0f4ff;
+    --muted:     #7a90b0;
+    --border:    #1a2d4a;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Cormorant Garamond', serif;
+    --sans: 'Syne', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── Custom cursor ── */
+  #cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--azure-lt); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: width .2s, height .2s, background .2s;
+    mix-blend-mode: screen;
+  }
+  #cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid var(--azure); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform .12s ease, width .25s, height .25s, opacity .25s;
+    opacity: .6;
+  }
+  body:hover #cursor { opacity: 1; }
+
+  /* ── Noise overlay ── */
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: .025; pointer-events:none; z-index:0;
+  }
+
+  /* ── Grid lines ── */
+  body::after {
+    content:''; position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity:.35; pointer-events:none; z-index:0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1.4rem 4rem;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    background: #060d1acc;
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: .85rem; letter-spacing:.2em;
+    color: var(--azure-lt);
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display:flex; gap:2.5rem; list-style:none; }
+  .nav-links a {
+    font-family: var(--mono); font-size:.7rem; letter-spacing:.15em;
+    color: var(--muted); text-decoration:none; text-transform:uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    font-family: var(--mono); font-size:.72rem; letter-spacing:.12em;
+    color: var(--azure-lt); border: 1px solid var(--azure);
+    padding:.55rem 1.4rem; text-decoration:none; text-transform:uppercase;
+    transition: background .2s, color .2s;
+  }
+  .nav-cta:hover { background: var(--azure); color:#fff; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height:100vh; display:grid;
+    grid-template-columns: 1fr 1fr;
+    align-items:center;
+    padding: 10rem 4rem 6rem;
+    position:relative; overflow:hidden;
+  }
+  .hero-glow {
+    position:absolute; right:-10%; top:10%;
+    width:600px; height:600px;
+    background: radial-gradient(circle, var(--azure-glow) 0%, transparent 70%);
+    pointer-events:none;
+    animation: pulse 6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100%{transform:scale(1);opacity:.5}
+    50%{transform:scale(1.15);opacity:.8}
+  }
+  .hero-eyebrow {
+    font-family: var(--mono); font-size:.72rem; letter-spacing:.25em;
+    color: var(--gold); text-transform:uppercase; margin-bottom:1.6rem;
+    opacity:0; animation: fadeUp .8s .2s forwards;
+  }
+  .hero-title {
+    font-family: var(--serif); font-weight:300;
+    font-size: clamp(3.2rem, 5.5vw, 5.8rem); line-height:1.05;
+    letter-spacing:-.01em;
+    opacity:0; animation: fadeUp .8s .4s forwards;
+  }
+  .hero-title em { font-style:italic; color: var(--azure-lt); }
+  .hero-title strong { font-weight:600; display:block; }
+  .hero-sub {
+    margin-top:2rem; font-family: var(--mono); font-size:.8rem;
+    color: var(--muted); line-height:1.8; max-width:460px;
+    opacity:0; animation: fadeUp .8s .6s forwards;
+  }
+  .hero-actions {
+    display:flex; gap:1.2rem; margin-top:3rem;
+    opacity:0; animation: fadeUp .8s .8s forwards;
+  }
+  .btn-primary {
+    background: var(--azure); color:#fff;
+    font-family: var(--mono); font-size:.75rem; letter-spacing:.1em;
+    padding:.9rem 2.2rem; text-decoration:none; text-transform:uppercase;
+    border:1px solid var(--azure); transition: background .2s, transform .15s;
+  }
+  .btn-primary:hover { background: var(--azure-lt); transform:translateY(-2px); }
+  .btn-outline {
+    color: var(--white); border:1px solid var(--border);
+    font-family: var(--mono); font-size:.75rem; letter-spacing:.1em;
+    padding:.9rem 2.2rem; text-decoration:none; text-transform:uppercase;
+    transition: border-color .2s, transform .15s;
+  }
+  .btn-outline:hover { border-color: var(--azure); transform:translateY(-2px); }
+
+  /* Hero right — stats panel */
+  .hero-right {
+    display:flex; flex-direction:column; gap:1px;
+    padding-left:4rem; border-left:1px solid var(--border);
+    opacity:0; animation: fadeUp .8s 1s forwards;
+  }
+  .stat-card {
+    padding:2rem 2.5rem; border-bottom:1px solid var(--border);
+    position:relative; overflow:hidden;
+    transition: background .2s;
+  }
+  .stat-card:hover { background: var(--navy-card); }
+  .stat-card::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background: var(--azure); transform:scaleY(0); transform-origin:top;
+    transition: transform .35s;
+  }
+  .stat-card:hover::before { transform:scaleY(1); }
+  .stat-num {
+    font-family: var(--serif); font-size:3.5rem; font-weight:300;
+    color: var(--azure-lt); line-height:1;
+  }
+  .stat-num span { font-size:1.8rem; }
+  .stat-label {
+    font-family: var(--mono); font-size:.68rem; letter-spacing:.15em;
+    color: var(--muted); text-transform:uppercase; margin-top:.4rem;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── SECTION COMMONS ── */
+  section { position:relative; z-index:1; }
+  .section-wrap { max-width:1280px; margin:0 auto; padding:7rem 4rem; }
+  .section-tag {
+    font-family: var(--mono); font-size:.68rem; letter-spacing:.25em;
+    color: var(--gold); text-transform:uppercase; margin-bottom:1rem;
+  }
+  .section-title {
+    font-family: var(--serif); font-weight:300;
+    font-size: clamp(2.4rem,4vw,3.8rem); line-height:1.1;
+  }
+  .section-title em { font-style:italic; color:var(--azure-lt); }
+  .divider {
+    width:60px; height:1px; background:var(--azure);
+    margin:1.5rem 0 2.5rem;
+  }
+
+  /* ── SERVICES ── */
+  #services { background: var(--navy-mid); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .services-grid {
+    display:grid; grid-template-columns: repeat(3,1fr); gap:1px;
+    margin-top:4rem;
+    border:1px solid var(--border);
+  }
+  .srv-card {
+    padding:2.5rem; position:relative; overflow:hidden;
+    transition: background .25s;
+    background: var(--navy-mid);
+  }
+  .srv-card:hover { background: var(--navy-card); }
+  .srv-icon {
+    font-size:1.6rem; margin-bottom:1.5rem;
+    width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--border); color:var(--azure-lt);
+    transition: border-color .25s, background .25s;
+  }
+  .srv-card:hover .srv-icon { border-color:var(--azure); background:var(--azure-glow); }
+  .srv-title {
+    font-family: var(--serif); font-size:1.5rem; font-weight:400;
+    margin-bottom:.8rem;
+  }
+  .srv-desc {
+    font-family: var(--mono); font-size:.72rem; color:var(--muted);
+    line-height:1.9;
+  }
+  .srv-tags {
+    display:flex; flex-wrap:wrap; gap:.4rem; margin-top:1.5rem;
+  }
+  .tag {
+    font-family:var(--mono); font-size:.62rem; letter-spacing:.1em;
+    color:var(--azure); border:1px solid var(--azure-glow);
+    padding:.25rem .7rem; text-transform:uppercase;
+  }
+
+  /* ── INDUSTRIES ── */
+  #industries .section-wrap { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+  .ind-list { margin-top:2rem; display:flex; flex-direction:column; gap:.5rem; }
+  .ind-item {
+    display:flex; align-items:center; gap:1rem;
+    padding:1.2rem 1.5rem; border:1px solid transparent;
+    cursor:default; transition: border-color .2s, background .2s;
+    font-family: var(--mono); font-size:.78rem; color:var(--muted);
+  }
+  .ind-item:hover { border-color:var(--border); background:var(--navy-card); color:var(--white); }
+  .ind-item::before {
+    content:''; width:6px; height:6px; background:var(--azure);
+    flex-shrink:0; transition: background .2s;
+  }
+  .ind-item:hover::before { background:var(--gold); }
+  .ind-visual {
+    background:var(--navy-card); border:1px solid var(--border);
+    padding:3rem; position:relative; overflow:hidden;
+  }
+  .ind-visual::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, var(--azure-glow) 0%, transparent 60%);
+  }
+  .arch-diagram { position:relative; z-index:1; }
+  .arch-row { display:flex; gap:1rem; margin-bottom:1rem; align-items:center; justify-content:center; }
+  .arch-box {
+    font-family:var(--mono); font-size:.6rem; letter-spacing:.08em;
+    text-transform:uppercase; padding:.5rem 1rem;
+    border:1px solid var(--border); color:var(--muted); text-align:center;
+    background:var(--navy);
+  }
+  .arch-box.azure { border-color:var(--azure); color:var(--azure-lt); }
+  .arch-box.gold { border-color:var(--gold); color:var(--gold-lt); }
+  .arch-arrow { color:var(--border); font-size:.8rem; }
+
+  /* ── FINOPS ── */
+  #finops { background:var(--navy-mid); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .finops-inner { display:grid; grid-template-columns:1fr 1.2fr; gap:5rem; align-items:start; }
+  .finops-bars { display:flex; flex-direction:column; gap:1.2rem; margin-top:2.5rem; }
+  .fbar-label {
+    display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:.68rem; color:var(--muted); margin-bottom:.4rem;
+  }
+  .fbar-track {
+    height:6px; background:var(--border); position:relative; overflow:hidden;
+  }
+  .fbar-fill {
+    height:100%; background:linear-gradient(90deg, var(--azure), var(--azure-lt));
+    width:0; transition:width 1.4s cubic-bezier(.25,.8,.25,1);
+  }
+  .fbar-fill.gold-bar {
+    background:linear-gradient(90deg, var(--gold), var(--gold-lt));
+  }
+  .finops-pillars { display:grid; grid-template-columns:1fr 1fr; gap:1px; margin-top:.5rem; }
+  .pillar {
+    padding:2rem; background:var(--navy); border:1px solid var(--border);
+    transition:background .2s;
+  }
+  .pillar:hover { background:var(--navy-card); }
+  .pillar-icon { font-size:1.3rem; margin-bottom:.8rem; }
+  .pillar-title { font-family:var(--sans); font-size:.85rem; font-weight:600; margin-bottom:.4rem; }
+  .pillar-desc { font-family:var(--mono); font-size:.68rem; color:var(--muted); line-height:1.8; }
+
+  /* ── ABOUT ── */
+  #about .section-wrap { display:grid; grid-template-columns:1.2fr 1fr; gap:5rem; align-items:start; }
+  .about-body {
+    font-family:var(--mono); font-size:.78rem; color:var(--muted);
+    line-height:2; margin-top:1.5rem;
+  }
+  .about-body p + p { margin-top:1.2rem; }
+  .cert-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:3rem; }
+  .cert {
+    padding:1rem 1.2rem; border:1px solid var(--border);
+    font-family:var(--mono); font-size:.65rem; letter-spacing:.08em;
+    color:var(--muted); transition:border-color .2s, color .2s;
+    display:flex; align-items:center; gap:.7rem;
+  }
+  .cert:hover { border-color:var(--azure); color:var(--azure-lt); }
+  .cert-dot { width:5px; height:5px; background:var(--azure); flex-shrink:0; }
+  .profile-panel {
+    background:var(--navy-card); border:1px solid var(--border); padding:2.5rem;
+    position:sticky; top:7rem;
+  }
+  .profile-avatar {
+    width:80px; height:80px;
+    background:linear-gradient(135deg,var(--azure),var(--navy));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-size:2.2rem; color:#fff;
+    margin-bottom:1.5rem; font-weight:300; font-style:italic;
+  }
+  .profile-name { font-family:var(--serif); font-size:1.8rem; font-weight:300; }
+  .profile-role { font-family:var(--mono); font-size:.68rem; color:var(--azure-lt); letter-spacing:.12em; margin-top:.3rem; }
+  .profile-meta { margin-top:1.5rem; display:flex; flex-direction:column; gap:.7rem; }
+  .meta-row {
+    display:flex; align-items:center; gap:.8rem;
+    font-family:var(--mono); font-size:.68rem; color:var(--muted);
+  }
+  .meta-icon { color:var(--azure); width:14px; text-align:center; }
+  .profile-availability {
+    margin-top:1.8rem; padding:1rem 1.2rem;
+    background:rgba(0,120,212,.1); border:1px solid var(--azure-glow);
+    font-family:var(--mono); font-size:.68rem; color:var(--azure-lt);
+    display:flex; align-items:center; gap:.7rem;
+  }
+  .avail-dot {
+    width:7px; height:7px; background:#00e676; border-radius:50%;
+    flex-shrink:0; animation:blink 2s infinite;
+  }
+  @keyframes blink {
+    0%,100%{opacity:1} 50%{opacity:.3}
+  }
+
+  /* ── PROCESS ── */
+  #process { border-top:1px solid var(--border); }
+  .process-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:4rem; border:1px solid var(--border); }
+  .step {
+    padding:2.5rem 2rem; background:var(--navy);
+    position:relative; transition:background .2s;
+  }
+  .step:hover { background:var(--navy-card); }
+  .step-num {
+    font-family:var(--serif); font-size:3.5rem; font-weight:300;
+    color:var(--border); line-height:1; margin-bottom:1rem;
+    transition:color .2s;
+  }
+  .step:hover .step-num { color:var(--azure-glow); }
+  .step-title { font-family:var(--sans); font-size:.9rem; font-weight:600; margin-bottom:.6rem; }
+  .step-desc { font-family:var(--mono); font-size:.7rem; color:var(--muted); line-height:1.8; }
+
+  /* ── CONTACT ── */
+  #contact { background:var(--navy-mid); border-top:1px solid var(--border); }
+  .contact-inner { display:grid; grid-template-columns:1fr 1fr; gap:5rem; }
+  .contact-form { display:flex; flex-direction:column; gap:1.2rem; margin-top:2rem; }
+  .form-field { display:flex; flex-direction:column; gap:.5rem; }
+  .form-field label { font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
+  .form-field input, .form-field textarea, .form-field select {
+    background:var(--navy); border:1px solid var(--border); color:var(--white);
+    font-family:var(--mono); font-size:.78rem; padding:.9rem 1.1rem;
+    outline:none; transition:border-color .2s; width:100%;
+    appearance:none;
+  }
+  .form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+    border-color:var(--azure);
+  }
+  .form-field textarea { resize:vertical; min-height:120px; }
+  .form-field select option { background:var(--navy); }
+  .btn-submit {
+    background:var(--azure); color:#fff; border:none; cursor:pointer;
+    font-family:var(--mono); font-size:.75rem; letter-spacing:.1em;
+    padding:1rem 2rem; text-transform:uppercase;
+    transition:background .2s, transform .15s; align-self:flex-start;
+  }
+  .btn-submit:hover { background:var(--azure-lt); transform:translateY(-2px); }
+  .contact-info { padding-top:2rem; }
+  .contact-detail {
+    display:flex; align-items:center; gap:1.2rem;
+    padding:1.5rem 0; border-bottom:1px solid var(--border);
+    font-family:var(--mono); font-size:.75rem; color:var(--muted);
+  }
+  .contact-detail:last-child { border-bottom:none; }
+  .ci-icon { color:var(--azure); font-size:1rem; width:20px; }
+  .ci-val { color:var(--white); }
+  .contact-social { display:flex; gap:.8rem; margin-top:2rem; }
+  .soc-btn {
+    font-family:var(--mono); font-size:.65rem; letter-spacing:.1em;
+    color:var(--muted); border:1px solid var(--border);
+    padding:.5rem 1rem; text-decoration:none; text-transform:uppercase;
+    transition:border-color .2s, color .2s;
+  }
+  .soc-btn:hover { border-color:var(--azure); color:var(--azure-lt); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top:1px solid var(--border); padding:2rem 4rem;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--mono); font-size:.65rem; color:var(--muted);
+  }
+  footer span { color:var(--azure-lt); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity:1; transform:none; }
+
+  /* ── Responsive ── */
+  @media(max-width:900px){
+    nav { padding:1.2rem 1.5rem; }
+    .nav-links { display:none; }
+    #hero { grid-template-columns:1fr; padding:8rem 1.5rem 4rem; }
+    .hero-right { padding-left:0; border-left:none; border-top:1px solid var(--border); padding-top:2rem; }
+    .section-wrap { padding:5rem 1.5rem; }
+    .services-grid, .process-steps { grid-template-columns:1fr; }
+    .finops-inner, .contact-inner, #about .section-wrap, #industries .section-wrap { grid-template-columns:1fr; gap:3rem; }
+    .finops-pillars { grid-template-columns:1fr; }
+    footer { flex-direction:column; gap:.8rem; text-align:center; }
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>Emanuel</h1>
-    <p>Cloud & DevOps Engineer</p>
-  </header>
+<!-- Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
-  <section id="about">
-    <h2>About Me</h2>
-    <p>I design and operate cloud infrastructure on Azure.</p>
-  </section>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CLOUD<span>AXIS</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#industries">Industries</a></li>
+    <li><a href="#finops">FinOps</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+  </ul>
+  <a class="nav-cta" href="#contact">Get in Touch</a>
+</nav>
 
-  <section id="projects">
-    <h2>Projects</h2>
-    <ul>
-      <li>Azure Data Platform</li>
-      <li>AVD + Oracle Integration</li>
-    </ul>
-  </section>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-left">
+    <p class="hero-eyebrow">// Azure Infrastructure &amp; Cloud FinOps</p>
+    <h1 class="hero-title">
+      Cloud Strategy<br>
+      <em>engineered</em> for<br>
+      <strong>Insurance.</strong>
+    </h1>
+    <p class="hero-sub">
+      Freelance Azure architect and Cloud FinOps specialist — delivering<br>
+      mission-critical infrastructure, cost governance, and compliance-ready<br>
+      cloud environments tailored to the insurance sector.
+    </p>
+    <div class="hero-actions">
+      <a href="#services" class="btn-primary">View Services</a>
+      <a href="#contact" class="btn-outline">Schedule a Call</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="stat-card">
+      <div class="stat-num">8<span>+ yrs</span></div>
+      <div class="stat-label">Azure Architecture Experience</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">40<span>%</span></div>
+      <div class="stat-label">Avg. Cloud Cost Reduction</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">15<span>+</span></div>
+      <div class="stat-label">Insurance Clients Served</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">ISO<span>&nbsp;27001</span></div>
+      <div class="stat-label">Compliance-Aware Delivery</div>
+    </div>
+  </div>
+</section>
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Email: your@email.com</p>
-  </section>
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-wrap">
+    <p class="section-tag reveal">// 01 — What I Do</p>
+    <h2 class="section-title reveal">Core <em>Services</em></h2>
+    <div class="divider reveal"></div>
+    <div class="services-grid">
+      <div class="srv-card reveal">
+        <div class="srv-icon">☁</div>
+        <h3 class="srv-title">Azure Infrastructure Design</h3>
+        <p class="srv-desc">End-to-end design and deployment of scalable, resilient Azure environments — Landing Zones, hub-and-spoke networking, and policy-driven governance tailored to insurance workloads.</p>
+        <div class="srv-tags">
+          <span class="tag">Landing Zones</span>
+          <span class="tag">VNET</span>
+          <span class="tag">Policy</span>
+          <span class="tag">IaC</span>
+        </div>
+      </div>
+      <div class="srv-card reveal" style="animation-delay:.1s">
+        <div class="srv-icon">💰</div>
+        <h3 class="srv-title">Cloud FinOps &amp; Cost Optimization</h3>
+        <p class="srv-desc">Implementing FinOps frameworks, tagging strategies, cost allocation models, and rightsizing to reduce cloud spend — without sacrificing performance or compliance posture.</p>
+        <div class="srv-tags">
+          <span class="tag">Cost Management</span>
+          <span class="tag">Tagging</span>
+          <span class="tag">Budgets</span>
+          <span class="tag">Reservations</span>
+        </div>
+      </div>
+      <div class="srv-card reveal" style="animation-delay:.2s">
+        <div class="srv-icon">🔒</div>
+        <h3 class="srv-title">Security &amp; Compliance</h3>
+        <p class="srv-desc">Hardening Azure environments against regulatory frameworks (DORA, GDPR, Solvency II) with Microsoft Defender, Sentinel, Entra ID governance, and Zero Trust architecture.</p>
+        <div class="srv-tags">
+          <span class="tag">DORA</span>
+          <span class="tag">Zero Trust</span>
+          <span class="tag">Sentinel</span>
+          <span class="tag">Entra ID</span>
+        </div>
+      </div>
+      <div class="srv-card reveal" style="animation-delay:.1s">
+        <div class="srv-icon">⚙</div>
+        <h3 class="srv-title">Infrastructure as Code</h3>
+        <p class="srv-desc">Automating infrastructure lifecycle with Bicep, Terraform, and Azure DevOps pipelines — enabling repeatable, auditable deployments across environments.</p>
+        <div class="srv-tags">
+          <span class="tag">Bicep</span>
+          <span class="tag">Terraform</span>
+          <span class="tag">DevOps</span>
+          <span class="tag">GitOps</span>
+        </div>
+      </div>
+      <div class="srv-card reveal" style="animation-delay:.2s">
+        <div class="srv-icon">📊</div>
+        <h3 class="srv-title">Monitoring &amp; Observability</h3>
+        <p class="srv-desc">Building comprehensive monitoring stacks with Azure Monitor, Log Analytics, and custom dashboards — ensuring SLA visibility, incident response, and audit readiness.</p>
+        <div class="srv-tags">
+          <span class="tag">Azure Monitor</span>
+          <span class="tag">Log Analytics</span>
+          <span class="tag">Alerting</span>
+        </div>
+      </div>
+      <div class="srv-card reveal" style="animation-delay:.3s">
+        <div class="srv-icon">🔄</div>
+        <h3 class="srv-title">Cloud Migration &amp; Modernization</h3>
+        <p class="srv-desc">Lift-and-shift or re-architecture of legacy insurance platforms to Azure — with phased migration strategies, minimal downtime, and robust rollback planning.</p>
+        <div class="srv-tags">
+          <span class="tag">Migration</span>
+          <span class="tag">AVD</span>
+          <span class="tag">AKS</span>
+          <span class="tag">BCDR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <script src="assets/js/script.js"></script>
+<!-- INDUSTRIES -->
+<section id="industries">
+  <div class="section-wrap">
+    <div>
+      <p class="section-tag reveal">// 02 — Sector Expertise</p>
+      <h2 class="section-title reveal">Built for <em>Insurance</em></h2>
+      <div class="divider reveal"></div>
+      <p class="about-body reveal" style="margin-top:0">
+        The insurance industry demands infrastructure that is not only high-performing but rigorously compliant, auditable, and resilient. I specialize in the unique requirements of insurers operating on Azure.
+      </p>
+      <div class="ind-list reveal">
+        <div class="ind-item">Property &amp; Casualty Insurers (P&amp;C)</div>
+        <div class="ind-item">Life &amp; Health Insurance Providers</div>
+        <div class="ind-item">Reinsurance Companies</div>
+        <div class="ind-item">InsurTech Startups on Azure</div>
+        <div class="ind-item">Brokers &amp; MGAs</div>
+        <div class="ind-item">Pension &amp; Actuarial Platforms</div>
+      </div>
+    </div>
+    <div class="ind-visual reveal">
+      <p style="font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:2rem">Reference Architecture</p>
+      <div class="arch-diagram">
+        <div class="arch-row">
+          <div class="arch-box gold" style="width:100%;text-align:center">Insurance Workloads (Core, Claims, Actuarial)</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row" style="gap:.5rem">
+          <div class="arch-box azure">AVD / Endpoints</div>
+          <div class="arch-box azure">AKS Cluster</div>
+          <div class="arch-box azure">App Services</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row">
+          <div class="arch-box azure" style="flex:1">Hub VNET + Firewall</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row" style="gap:.5rem">
+          <div class="arch-box">Entra ID</div>
+          <div class="arch-box">Defender</div>
+          <div class="arch-box">Sentinel</div>
+          <div class="arch-box">Policy</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row">
+          <div class="arch-box gold" style="flex:1">Cost Management + FinOps Dashboard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINOPS -->
+<section id="finops">
+  <div class="section-wrap">
+    <div class="finops-inner">
+      <div>
+        <p class="section-tag reveal">// 03 — Cloud FinOps</p>
+        <h2 class="section-title reveal">Spend <em>visibility.</em><br>Real savings.</h2>
+        <div class="divider reveal"></div>
+        <p class="about-body reveal" style="margin-top:0">
+          Cloud costs can spiral without governance. I implement the full FinOps lifecycle — from allocation and showback to optimization and forecasting — so your finance and IT teams speak the same language.
+        </p>
+        <div class="finops-bars reveal">
+          <div>
+            <div class="fbar-label"><span>Average Cost Visibility Gain</span><span>92%</span></div>
+            <div class="fbar-track"><div class="fbar-fill" data-width="92"></div></div>
+          </div>
+          <div>
+            <div class="fbar-label"><span>Reserved Instance Utilization</span><span>88%</span></div>
+            <div class="fbar-track"><div class="fbar-fill" data-width="88"></div></div>
+          </div>
+          <div>
+            <div class="fbar-label"><span>Waste Reduction (avg.)</span><span>37%</span></div>
+            <div class="fbar-track"><div class="fbar-fill gold-bar" data-width="37"></div></div>
+          </div>
+          <div>
+            <div class="fbar-label"><span>Tagging Coverage Achieved</span><span>99%</span></div>
+            <div class="fbar-track"><div class="fbar-fill" data-width="99"></div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="finops-pillars reveal">
+          <div class="pillar">
+            <div class="pillar-icon">👁</div>
+            <div class="pillar-title">Inform</div>
+            <div class="pillar-desc">Cost allocation, tagging taxonomies, dashboards, and anomaly detection across subscriptions.</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🎯</div>
+            <div class="pillar-title">Optimize</div>
+            <div class="pillar-desc">Rightsizing, reserved capacity, spot usage, and automated shutdown schedules.</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">⚡</div>
+            <div class="pillar-title">Operate</div>
+            <div class="pillar-desc">FinOps governance rituals, budget alerts, chargeback models, and continuous improvement cycles.</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">📋</div>
+            <div class="pillar-title">Report</div>
+            <div class="pillar-desc">Executive-ready cost reports, trend analysis, and forecasting tied to business units.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-wrap">
+    <div>
+      <p class="section-tag reveal">// 04 — About</p>
+      <h2 class="section-title reveal">Precision-driven<br><em>cloud architect.</em></h2>
+      <div class="divider reveal"></div>
+      <div class="about-body reveal">
+        <p>I am an independent Azure architect and Cloud FinOps practitioner with over eight years of experience designing and operating enterprise-grade cloud environments. My focus is exclusively the insurance and financial services sector — an industry where regulatory precision, data sovereignty, and operational resilience are non-negotiable.</p>
+        <p>Working as a freelancer gives my clients direct access to senior expertise without the overhead of large consulting firms. Every engagement is personal, accountable, and outcomes-focused.</p>
+        <p>I hold multiple Microsoft certifications and stay current with the Azure roadmap, FinOps Foundation standards, and insurance-specific regulatory developments including DORA and Solvency II.</p>
+      </div>
+      <div class="cert-grid reveal">
+        <div class="cert"><span class="cert-dot"></span>AZ-900 Azure Fundamentals</div>
+        <div class="cert"><span class="cert-dot"></span>AZ-104 Azure Administrator</div>
+        <div class="cert"><span class="cert-dot"></span>AZ-305 Solutions Architect</div>
+        <div class="cert"><span class="cert-dot"></span>AZ-500 Security Engineer</div>
+        <div class="cert"><span class="cert-dot"></span>FinOps Foundation Certified</div>
+        <div class="cert"><span class="cert-dot"></span>SC-100 Cybersecurity Architect</div>
+      </div>
+    </div>
+    <div>
+      <div class="profile-panel reveal">
+        <div class="profile-avatar">A</div>
+        <div class="profile-name">Alex Müller</div>
+        <div class="profile-role">// Azure Architect &amp; FinOps Specialist</div>
+        <div class="profile-meta">
+          <div class="meta-row"><span class="meta-icon">📍</span> Germany — remote-first, EU travel</div>
+          <div class="meta-row"><span class="meta-icon">🗣</span> German · English · French</div>
+          <div class="meta-row"><span class="meta-icon">🎓</span> M.Sc. Computer Science</div>
+          <div class="meta-row"><span class="meta-icon">⏱</span> Senior (8+ years Azure)</div>
+        </div>
+        <div class="profile-availability">
+          <div class="avail-dot"></div>
+          Available for new engagements — Q3 2025
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-wrap">
+    <p class="section-tag reveal">// 05 — How We Work</p>
+    <h2 class="section-title reveal">The <em>Engagement</em> Process</h2>
+    <div class="divider reveal"></div>
+    <div class="process-steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Discovery Call</div>
+        <div class="step-desc">30-minute scoping session to understand your architecture, pain points, regulatory context, and project objectives.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:.1s">
+        <div class="step-num">02</div>
+        <div class="step-title">Assessment &amp; Proposal</div>
+        <div class="step-desc">Detailed architecture review, cost analysis, and a clear proposal with scope, deliverables, timeline, and pricing.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:.2s">
+        <div class="step-num">03</div>
+        <div class="step-title">Design &amp; Build</div>
+        <div class="step-desc">Iterative delivery with weekly checkpoints, documentation-first approach, and continuous stakeholder alignment.</div>
+      </div>
+      <div class="step reveal" style="transition-delay:.3s">
+        <div class="step-num">04</div>
+        <div class="step-title">Handover &amp; Support</div>
+        <div class="step-desc">Full knowledge transfer, runbooks, and optional retainer for ongoing FinOps governance and architecture advisory.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-wrap">
+    <div class="contact-inner">
+      <div>
+        <p class="section-tag reveal">// 06 — Contact</p>
+        <h2 class="section-title reveal">Let's build something<br><em>exceptional.</em></h2>
+        <div class="divider reveal"></div>
+        <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+          <div class="form-field">
+            <label>Full Name</label>
+            <input type="text" placeholder="Jane Doe" />
+          </div>
+          <div class="form-field">
+            <label>Company &amp; Role</label>
+            <input type="text" placeholder="Allianz — Head of IT" />
+          </div>
+          <div class="form-field">
+            <label>Email Address</label>
+            <input type="email" placeholder="jane@company.com" />
+          </div>
+          <div class="form-field">
+            <label>Service Interest</label>
+            <select>
+              <option value="">Select a service…</option>
+              <option>Azure Infrastructure Design</option>
+              <option>Cloud FinOps &amp; Cost Optimization</option>
+              <option>Security &amp; Compliance</option>
+              <option>Infrastructure as Code</option>
+              <option>Cloud Migration</option>
+              <option>General Consulting</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Message</label>
+            <textarea placeholder="Briefly describe your project or challenge…"></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Send Message →</button>
+        </form>
+      </div>
+      <div class="contact-info reveal">
+        <div class="contact-detail">
+          <span class="ci-icon">✉</span>
+          <div><div style="font-size:.62rem;color:var(--muted);margin-bottom:.2rem;font-family:var(--mono);letter-spacing:.1em">EMAIL</div><div class="ci-val">hello@cloudaxis.dev</div></div>
+        </div>
+        <div class="contact-detail">
+          <span class="ci-icon">📞</span>
+          <div><div style="font-size:.62rem;color:var(--muted);margin-bottom:.2rem;font-family:var(--mono);letter-spacing:.1em">PHONE / SIGNAL</div><div class="ci-val">+49 151 000 000 00</div></div>
+        </div>
+        <div class="contact-detail">
+          <span class="ci-icon">🕒</span>
+          <div><div style="font-size:.62rem;color:var(--muted);margin-bottom:.2rem;font-family:var(--mono);letter-spacing:.1em">TIMEZONE</div><div class="ci-val">CET / CEST (Europe/Berlin)</div></div>
+        </div>
+        <div class="contact-detail">
+          <span class="ci-icon">📄</span>
+          <div><div style="font-size:.62rem;color:var(--muted);margin-bottom:.2rem;font-family:var(--mono);letter-spacing:.1em">ENGAGEMENT MODEL</div><div class="ci-val">Project-based · T&amp;M · Retainer</div></div>
+        </div>
+        <div class="contact-social">
+          <a class="soc-btn" href="#">LinkedIn</a>
+          <a class="soc-btn" href="#">GitHub</a>
+          <a class="soc-btn" href="#">XING</a>
+        </div>
+        <div style="margin-top:2.5rem;padding:1.5rem;border:1px solid var(--border);font-family:var(--mono);font-size:.68rem;color:var(--muted);line-height:1.9">
+          <span style="color:var(--gold)">// Response SLA</span><br>
+          I respond to all enquiries within 24 business hours. For urgent matters, please use Signal or call directly.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 2025 <span>CloudAxis</span> — Alex Müller · Freelance Azure &amp; FinOps Consultant</div>
+  <div style="font-family:var(--mono);font-size:.62rem">
+    <span style="color:var(--border)">USt-IdNr: DE</span> 000 000 000 &nbsp;·&nbsp; All rights reserved
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX; my=e.clientY;
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+  });
+  (function animRing(){
+    rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,.srv-card,.step,.stat-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{
+      cur.style.width='16px'; cur.style.height='16px';
+      ring.style.width='56px'; ring.style.height='56px';
+    });
+    el.addEventListener('mouseleave',()=>{
+      cur.style.width='10px'; cur.style.height='10px';
+      ring.style.width='36px'; ring.style.height='36px';
+    });
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        // Animate bars when visible
+        e.target.querySelectorAll('.fbar-fill').forEach(b=>{
+          b.style.width = b.dataset.width+'%';
+        });
+      }
+    });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  // Also trigger bars if already visible on load
+  document.querySelectorAll('.fbar-fill').forEach(b=>{
+    const rect=b.closest('.finops-bars')?.getBoundingClientRect();
+    if(rect&&rect.top<window.innerHeight) b.style.width=b.dataset.width+'%';
+  });
+
+  // Contact form
+  function handleSubmit(e){
+    e.preventDefault();
+    const btn=e.target.querySelector('.btn-submit');
+    btn.textContent='Message Sent ✓';
+    btn.style.background='#00c853';
+    setTimeout(()=>{
+      btn.textContent='Send Message →';
+      btn.style.background='';
+      e.target.reset();
+    },3000);
+  }
+</script>
 </body>
 </html>
