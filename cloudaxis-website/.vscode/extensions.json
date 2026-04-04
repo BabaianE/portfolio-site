@@ -1,0 +1,14 @@
+{
+  // Recommended VSCode extensions for this project.
+  // VSCode will prompt you to install these when opening the workspace.
+  "recommendations": [
+    "esbenp.prettier-vscode",       // Prettier — code formatter
+    "dbaeumer.vscode-eslint",       // ESLint — JS linting
+    "stylelint.vscode-stylelint",   // Stylelint — CSS linting
+    "ritwickdey.LiveServer",        // Live Server — instant browser preview
+    "formulahendry.auto-rename-tag",// Auto Rename Tag — sync HTML tag edits
+    "christian-kohler.path-intellisense", // Path IntelliSense — file path autocomplete
+    "streetsidesoftware.code-spell-checker", // Spell Checker
+    "eamodio.gitlens"               // GitLens — enhanced Git history in editor
+  ]
+}
