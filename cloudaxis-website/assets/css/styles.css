@@ -38,35 +38,9 @@ body {
   color:        var(--white);
   font-family:  var(--font-sans);
   overflow-x:   hidden;
-  cursor:       none;
+  cursor:       auto;
 }
 
-/* ── Custom Cursor ── */
-#cursor {
-  position:       fixed;
-  width:          10px;
-  height:         10px;
-  background:     var(--azure-lt);
-  border-radius:  50%;
-  pointer-events: none;
-  z-index:        9999;
-  transform:      translate(-50%, -50%);
-  transition:     width .2s, height .2s, background .2s;
-  mix-blend-mode: screen;
-}
-#cursor-ring {
-  position:       fixed;
-  width:          36px;
-  height:         36px;
-  border:         1px solid var(--azure);
-  border-radius:  50%;
-  pointer-events: none;
-  z-index:        9998;
-  transform:      translate(-50%, -50%);
-  transition:     transform .12s ease, width .25s, height .25s, opacity .25s;
-  opacity:        .6;
-}
-body:hover #cursor { opacity: 1; }
 
 /* ── Background Effects ── */
 /* Noise overlay */
@@ -803,4 +777,57 @@ footer .footer-brand { color: var(--azure-lt); }
   #industries .section-wrap { grid-template-columns: 1fr; gap: 3rem; }
   .finops-pillars { grid-template-columns: 1fr; }
   footer { flex-direction: column; gap: .8rem; text-align: center; }
+}
+/* ── Hamburger Button (hidden on desktop) ── */
+.nav-hamburger {
+  display:        none;
+  flex-direction: column;
+  justify-content:center;
+  gap:            5px;
+  background:     none;
+  border:         1px solid var(--border);
+  padding:        .5rem .6rem;
+  cursor:         pointer;
+  z-index:        200;
+}
+.nav-hamburger span {
+  display:    block;
+  width:      22px;
+  height:     1px;
+  background: var(--white);
+  transition: transform .3s, opacity .3s;
+}
+
+/* Animated X state */
+.nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ── Mobile Menu Overlay ── */
+@media (max-width: 900px) {
+  .nav-cta       { display: none; }
+  .nav-hamburger { display: flex; }
+
+  .nav-links {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    gap:             2rem;
+    position:        fixed;
+    inset:           0;
+    background:      var(--navy);
+    z-index:         150;
+    opacity:         0;
+    pointer-events:  none;
+    transition:      opacity .3s ease;
+  }
+  .nav-links.open {
+    opacity:        1;
+    pointer-events: auto;
+  }
+  .nav-links a {
+    font-size:   1rem;
+    letter-spacing: .2em;
+  }
 }
