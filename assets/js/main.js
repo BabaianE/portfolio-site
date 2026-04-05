@@ -6,46 +6,6 @@
 
 'use strict';
 
-/* ── Custom Cursor ─────────────────────────────────────────── 
-(function initCursor() {
-  const cur  = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
-  if (!cur || !ring) return;
-
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX;
-    my = e.clientY;
-    cur.style.left = mx + 'px';
-    cur.style.top  = my + 'px';
-  });
-
-  (function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-    requestAnimationFrame(animateRing);
-  })();
-
-  const interactiveEls = document.querySelectorAll('a, button, .srv-card, .step, .stat-card');
-  interactiveEls.forEach((el) => {
-    el.addEventListener('mouseenter', () => {
-      cur.style.width    = '16px';
-      cur.style.height   = '16px';
-      ring.style.width   = '56px';
-      ring.style.height  = '56px';
-    });
-    el.addEventListener('mouseleave', () => {
-      cur.style.width    = '10px';
-      cur.style.height   = '10px';
-      ring.style.width   = '36px';
-      ring.style.height  = '36px';
-    });
-  });
-})();
-*/
 /* ── Scroll Reveal ─────────────────────────────────────────── */
 (function initScrollReveal() {
   const observer = new IntersectionObserver((entries) => {
@@ -89,7 +49,7 @@
 
     // Basic validation
     if (!name || !email) {
-      setButtonState(btn, '⚠ Please fill in name & email', '#c0392b');
+      setButtonState(btn, 'Please fill in name & email', '#c0392b');
       setTimeout(() => resetButton(btn), 2500);
       return;
     }
@@ -97,24 +57,22 @@
     // Build mailto URL
     const subject = encodeURIComponent(
       service
-        ? `[CloudAxis] Enquiry: ${service}`
-        : `[CloudAxis] New Enquiry from ${name}`
+        ? '[CloudAxis] Enquiry: ' + service
+        : '[CloudAxis] New Enquiry from ' + name
     );
     const body = encodeURIComponent(
-`Name:     ${name}
-Company:  ${company || '—'}
-Email:    ${email}
-Service:  ${service || '—'}
-
-Message:
-${message || '—'}`
+      'Name:     ' + name + '\n' +
+      'Company:  ' + (company || '-') + '\n' +
+      'Email:    ' + email + '\n' +
+      'Service:  ' + (service || '-') + '\n\n' +
+      'Message:\n' + (message || '-')
     );
 
-    // ⚠️  Replace with your real email address
+    // Replace with your real email address
     const recipient = 'hello@cloudaxis.dev';
-    window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+    window.location.href = 'mailto:' + recipient + '?subject=' + subject + '&body=' + body;
 
-    setButtonState(btn, 'Opening your email client… ✓', '#00c853');
+    setButtonState(btn, 'Opening your email client... Done', '#00c853');
     setTimeout(() => { resetButton(btn); form.reset(); }, 3500);
   });
 
@@ -124,8 +82,37 @@ ${message || '—'}`
     btn.style.borderColor = color;
   }
   function resetButton(btn) {
-    btn.textContent       = 'Send Message →';
+    btn.textContent       = 'Send Message';
     btn.style.background  = '';
     btn.style.borderColor = '';
   }
+})();
+
+/* ── Hamburger Menu ────────────────────────────────────────── */
+(function initHamburger() {
+  const btn   = document.querySelector('.nav-hamburger');
+  const links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+
+  function toggleMenu(open) {
+    btn.classList.toggle('open', open);
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  btn.addEventListener('click', () => {
+    const isOpen = links.classList.contains('open');
+    toggleMenu(!isOpen);
+  });
+
+  // Close when a nav link is clicked
+  links.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => toggleMenu(false));
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') toggleMenu(false);
+  });
 })();
