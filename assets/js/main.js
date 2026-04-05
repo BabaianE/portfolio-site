@@ -6,7 +6,7 @@
 
 'use strict';
 
-/* ── Custom Cursor ─────────────────────────────────────────── */
+/* ── Custom Cursor ─────────────────────────────────────────── 
 (function initCursor() {
   const cur  = document.getElementById('cursor');
   const ring = document.getElementById('cursor-ring');
@@ -45,7 +45,7 @@
     });
   });
 })();
-
+*/
 /* ── Scroll Reveal ─────────────────────────────────────────── */
 (function initScrollReveal() {
   const observer = new IntersectionObserver((entries) => {

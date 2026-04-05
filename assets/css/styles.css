@@ -38,7 +38,7 @@ body {
   color:        var(--white);
   font-family:  var(--font-sans);
   overflow-x:   hidden;
-  cursor:       none;
+  cursor:       auto;
 }
 
 /* ── Custom Cursor ── 
