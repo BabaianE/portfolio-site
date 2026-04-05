@@ -753,10 +753,63 @@ footer .footer-brand { color: var(--azure-lt); }
 }
 .reveal.visible { opacity: 1; transform: none; }
 
+/* ── Hamburger Button (hidden on desktop) ── */
+.nav-hamburger {
+  display:         none;
+  flex-direction:  column;
+  justify-content: center;
+  gap:             5px;
+  background:      none;
+  border:          1px solid var(--border);
+  padding:         .5rem .6rem;
+  cursor:          pointer;
+  z-index:         200;
+}
+.nav-hamburger span {
+  display:    block;
+  width:      22px;
+  height:     1px;
+  background: var(--white);
+  transition: transform .3s, opacity .3s;
+}
+
+/* Animated X state */
+.nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   nav { padding: 1.2rem 1.5rem; }
-  .nav-links { display: none; }
+
+  /* Hamburger visible, CTA hidden */
+  .nav-cta       { display: none; }
+  .nav-hamburger { display: flex; }
+
+  /* Nav links become full-screen overlay */
+  .nav-links {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    gap:             2rem;
+    position:        fixed;
+    inset:           0;
+    background:      var(--navy);
+    z-index:         150;
+    opacity:         0;
+    pointer-events:  none;
+    transition:      opacity .3s ease;
+    list-style:      none;
+  }
+  .nav-links.open {
+    opacity:        1;
+    pointer-events: auto;
+  }
+  .nav-links a {
+    font-size:      1rem;
+    letter-spacing: .2em;
+  }
 
   #hero {
     grid-template-columns: 1fr;
@@ -777,57 +830,4 @@ footer .footer-brand { color: var(--azure-lt); }
   #industries .section-wrap { grid-template-columns: 1fr; gap: 3rem; }
   .finops-pillars { grid-template-columns: 1fr; }
   footer { flex-direction: column; gap: .8rem; text-align: center; }
-}
-/* ── Hamburger Button (hidden on desktop) ── */
-.nav-hamburger {
-  display:        none;
-  flex-direction: column;
-  justify-content:center;
-  gap:            5px;
-  background:     none;
-  border:         1px solid var(--border);
-  padding:        .5rem .6rem;
-  cursor:         pointer;
-  z-index:        200;
-}
-.nav-hamburger span {
-  display:    block;
-  width:      22px;
-  height:     1px;
-  background: var(--white);
-  transition: transform .3s, opacity .3s;
-}
-
-/* Animated X state */
-.nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.nav-hamburger.open span:nth-child(2) { opacity: 0; }
-.nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-
-/* ── Mobile Menu Overlay ── */
-@media (max-width: 900px) {
-  .nav-cta       { display: none; }
-  .nav-hamburger { display: flex; }
-
-  .nav-links {
-    display:         flex;
-    flex-direction:  column;
-    align-items:     center;
-    justify-content: center;
-    gap:             2rem;
-    position:        fixed;
-    inset:           0;
-    background:      var(--navy);
-    z-index:         150;
-    opacity:         0;
-    pointer-events:  none;
-    transition:      opacity .3s ease;
-  }
-  .nav-links.open {
-    opacity:        1;
-    pointer-events: auto;
-  }
-  .nav-links a {
-    font-size:   1rem;
-    letter-spacing: .2em;
-  }
 }
