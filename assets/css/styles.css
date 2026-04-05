@@ -41,7 +41,7 @@ body {
   cursor:       auto;
 }
 
-/* ── Custom Cursor ── 
+/* ── Custom Cursor
 #cursor {
   position:       fixed;
   width:          10px;
@@ -67,7 +67,7 @@ body {
   opacity:        .6;
 }
 body:hover #cursor { opacity: 1; }
-*/
+── */
 
 /* ── Background Effects ── */
 /* Noise overlay */
