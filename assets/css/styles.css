@@ -329,17 +329,21 @@ footer { border-top: 1px solid var(--border); padding: 2rem 4rem; display: flex;
   .nav-cta { display: none; }
   .nav-hamburger { display: flex; }
 
-  /* Nav links become a full-screen overlay */
+  /* Nav links — slide-in sidebar from the right */
   .nav-links {
-    position: fixed; inset: 0; z-index: 1050;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2.5rem; list-style: none;
-    background: var(--navy);
-    opacity: 0; pointer-events: none;
-    transition: opacity .3s ease;
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 1050;
+    width: 280px;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    gap: 0; list-style: none; padding: 2rem;
+    background: var(--navy-mid);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
   }
-  .nav-links.open { opacity: 1; pointer-events: auto; }
-  .nav-links a { font-size: 1.1rem; letter-spacing: .2em; }
+  .nav-links.open { transform: translateX(0); pointer-events: auto; }
+  .nav-links li { width: 100%; border-bottom: 1px solid var(--border); }
+  .nav-links a { display: block; padding: 1.1rem 0; font-size: .8rem; letter-spacing: .2em; }
 
   /* Layout */
   #hero { grid-template-columns: 1fr; padding: 8rem 1.5rem 4rem; }
